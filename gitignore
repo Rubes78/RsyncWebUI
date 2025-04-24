@@ -1,0 +1,20 @@
+# Python cache and compiled files
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Logs
+*.log
+AppLog.log
+
+# Runtime data
+sync_history.json
+saved_paths.json
+
+# Environment folders
+venv/
+.env/
+
+# OS system files
+.DS_Store
+Thumbs.db
