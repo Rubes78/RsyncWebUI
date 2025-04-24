@@ -166,3 +166,8 @@ pre {
 #historyTable tr.highlight {
   background-color: #d4edda !important;
 }
+
+
+#historyTable tr.error-highlight {
+  background-color: #f8d7da !important;
+}

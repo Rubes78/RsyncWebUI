@@ -7,15 +7,20 @@ async function loadHistory() {
   // Sort by most recent first
   jobs.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
 
-  tableBody.innerHTML = jobs.map(job => `
-    <tr>
+  
+tableBody.innerHTML = jobs.map((job, index) => {
+  const rowClass = index === 0 && job.returncode !== 0 ? 'error-highlight' : (index === 0 ? 'highlight' : '');
+  return `
+    <tr class="${rowClass}">
       <td>${new Date(job.timestamp).toLocaleString()}</td>
       <td>${job.source}</td>
       <td>${job.destination}</td>
       <td>${job.options}</td>
       <td><button onclick="rerunJob('${job.source}', '${job.destination}', '${job.options}')">Re-run</button></td>
     </tr>
-  `).join('');
+  `;
+}).join('');
+    
 
   console.log("Highlighting most recent row...");
 
@@ -66,9 +71,16 @@ document.getElementById('rsyncForm').addEventListener('submit', async function(e
   const now = new Date();
   const formatted = now.toLocaleTimeString();
   const notification = document.getElementById('notificationBar');
-  notification.className = 'success';
-  notification.innerText = `✅ Synced: ${source} → ${destination} at ${formatted}`;
+  
+  if (result.returncode === 0) {
+    notification.className = 'success';
+    notification.innerText = `✅ Synced: ${source} → ${destination} at ${formatted}`;
+  } else {
+    notification.className = 'error';
+    notification.innerText = `❌ Sync failed: ${result.stderr || "Unknown error"}`;
+  }
   notification.style.display = 'block';
+    
   setTimeout(() => { notification.style.display = 'none'; }, 10000);
 
   loadHistory();
