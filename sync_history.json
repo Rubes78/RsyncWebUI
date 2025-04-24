@@ -1,0 +1,20 @@
+[
+  {
+    "timestamp": "2025-04-24T07:52:29.731096-05:00",
+    "source": "/Quarks/DockerCompose/Archive",
+    "destination": "/USB/Backup",
+    "options": "-avh --progress",
+    "stdout": "sending incremental file list\n\nsent 1.77K bytes  received 28 bytes  3.60K bytes/sec\ntotal size is 124.91K  speedup is 69.32\n",
+    "stderr": "",
+    "returncode": 0
+  },
+  {
+    "timestamp": "2025-04-24T07:52:37.271756-05:00",
+    "source": "/Quarks/DockerCompose/Archive",
+    "destination": "/USB/Backup",
+    "options": "-avh --progress",
+    "stdout": "sending incremental file list\n\nsent 1.77K bytes  received 28 bytes  3.60K bytes/sec\ntotal size is 124.91K  speedup is 69.32\n",
+    "stderr": "",
+    "returncode": 0
+  }
+]

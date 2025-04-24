@@ -1,0 +1,37 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Rsync Web UI</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Rsync Web Interface</h1>
+    <form id="rsyncForm">
+      <label>Source Path:</label>
+      <div class="path-input">
+        <input type="text" id="sourcePath" name="source" required>
+        <button type="button" onclick="openBrowser('sourcePath')">Browse</button>
+      </div>
+
+      <label>Destination Path:</label>
+      <div class="path-input">
+        <input type="text" id="destPath" name="destination" required>
+        <button type="button" onclick="openBrowser('destPath')">Browse</button>
+      </div>
+
+      <label>Rsync Options:</label>
+      <input type="text" id="rsyncOptions" name="options" value="-avh --progress">
+      <button type="submit">Start Sync</button>
+    </form>
+    <div id="statusPanel">Idle</div>
+    <pre id="rsyncOutput"></pre>
+    <h2>History</h2>
+    <div id="historyTable"></div>
+  </div>
+  <div id="browserModal" style="display:none; background:white; padding:20px; border:1px solid #ccc; position:fixed; top:10%; left:10%; width:80%; height:80%; overflow:auto; z-index:1000;"></div>
+  <script src="/static/js/rsync_runner.js"></script>
+  <script src="/static/js/folderpicker.js"></script>
+</body>
+</html>
