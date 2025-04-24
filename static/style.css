@@ -171,3 +171,27 @@ pre {
 #historyTable tr.error-highlight {
   background-color: #f8d7da !important;
 }
+
+
+/* Inline layout for path input + browse button */
+.path-input {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.path-input input {
+  flex: 1;
+}
+
+
+/* Inline layout for rsync options + Start Sync button */
+.options-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.options-row input {
+  flex: 1;
+}

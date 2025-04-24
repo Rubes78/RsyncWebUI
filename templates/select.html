@@ -5,10 +5,8 @@
   <title>Rsync Web UI</title>
   <link rel="stylesheet" href="/static/style.css">
 </head>
-
 <body>
   <div id="notificationBar" class="hidden"></div>
-
   <div class="container">
     <h1>Rsync Web Interface</h1>
     <form id="rsyncForm">
@@ -25,34 +23,36 @@
       </div>
 
       <label>Rsync Options:</label>
-      <input type="text" id="rsyncOptions" name="options" value="-avh --progress">
-      <button type="submit">Start Sync</button>
+      <div class="options-row">
+        <input type="text" id="rsyncOptions" name="options" value="-avh --progress --stats">
+        <button type="submit">Start Sync</button>
+      </div>
     </form>
+
     <div id="statusPanel">Idle</div>
     <pre id="rsyncOutput"></pre>
-    
-<h2>Sync History</h2>
-<table id="historyTable">
-  <thead>
-    <tr>
-      <th>Time</th>
-      <th>Source</th>
-      <th>Destination</th>
-      <th>Options</th>
-      <th>Action</th>
-    </tr>
-  </thead>
-  <tbody></tbody>
-</table>
 
+    <h2>Sync History</h2>
+    <table id="historyTable">
+      <thead>
+        <tr>
+          <th>Time</th>
+          <th>Source</th>
+          <th>Destination</th>
+          <th>Options</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
   </div>
-  
-<div id="browserModal" style="display:none; background:white; padding:20px; border:1px solid #ccc; position:fixed; top:10%; left:10%; width:80%; height:80%; overflow:auto; z-index:1000;">
-  <div style="text-align:right;">
-    <button onclick="closeBrowserModal()" style="font-size: 1.2em;">×</button>
+
+  <div id="browserModal" style="display:none; background:white; padding:20px; border:1px solid #ccc; position:fixed; top:10%; left:10%; width:80%; height:80%; overflow:auto; z-index:1000;">
+    <div style="text-align:right;">
+      <button onclick="closeBrowserModal()" style="font-size: 1.2em;">×</button>
+    </div>
+    <div id="browserContent"></div>
   </div>
-  <div id="browserContent"></div>
-</div>
 
   <script src="/static/js/rsync_runner.js"></script>
   <script src="/static/js/folderpicker.js"></script>

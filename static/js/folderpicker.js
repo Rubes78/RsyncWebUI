@@ -1,46 +1,35 @@
 
-let targetInput = null;
-
-function openBrowser(inputId) {
-  targetInput = document.getElementById(inputId);
-  showBrowser("/");
+function openBrowser(fieldId) {
+  const path = document.getElementById(fieldId).value || "/";
+  fetch("/browse?path=" + encodeURIComponent(path))
+    .then(res => res.json())
+    .then(data => {
+      const content = document.getElementById("browserContent");
+      content.innerHTML = "<h3>" + data.current + "</h3>";
+      data.contents.forEach(item => {
+        const div = document.createElement("div");
+        if (item.is_dir) {
+          div.innerHTML = "<a href='#' onclick=\"openBrowserWithPath('" + data.current + "/" + item.name + "', '" + fieldId + "')\">📁 " + item.name + "</a>";
+        } else {
+          div.textContent = "📄 " + item.name;
+        }
+        content.appendChild(div);
+      });
+      const selectBtn = document.createElement("button");
+      selectBtn.textContent = "Use This Folder";
+      selectBtn.onclick = () => {
+        document.getElementById(fieldId).value = data.current;
+        closeBrowserModal();
+      };
+      content.appendChild(selectBtn);
+      document.getElementById("browserModal").style.display = "block";
+    });
 }
 
-async function showBrowser(path) {
-  const res = await fetch(`/browse?path=${encodeURIComponent(path)}`);
-  const data = await res.json();
-  if (data.error) {
-    alert("Error: " + data.error);
-    return;
-  }
-
-  let html = `<div><strong>Current: ${data.current}</strong></div>`;
-  if (data.current !== "/") {
-    const parent = data.current.split("/").slice(0, -1).join("/") || "/";
-    html += `<div><a href="#" onclick="showBrowser('${parent}')">.. (Up)</a></div>`;
-  }
-
-  data.contents.forEach(item => {
-    const fullPath = `${data.current.replace(/\/$/, "")}/${item.name}`;
-    if (item.is_dir) {
-      html += `<div><a href="#" onclick="showBrowser('${fullPath}')">${item.name}/</a></div>`;
-    } else {
-      html += `<div>${item.name}</div>`;
-    }
-  });
-
-  html += `<button onclick="selectPath('${data.current}')">Select This Folder</button>`;
-  document.getElementById("browserContent").innerHTML = html;
-  document.getElementById("browserModal").style.display = "block";
+function openBrowserWithPath(path, fieldId) {
+  document.getElementById(fieldId).value = path;
+  openBrowser(fieldId);
 }
-
-function selectPath(path) {
-  if (targetInput) {
-    targetInput.value = path;
-  }
-  document.getElementById("browserModal").style.display = "none";
-}
-
 
 function closeBrowserModal() {
   document.getElementById("browserModal").style.display = "none";
