@@ -1,0 +1,109 @@
+
+body {
+  font-family: sans-serif;
+  background: #f4f4f4;
+  margin: 0;
+  padding: 20px;
+}
+.container {
+  background: white;
+  padding: 20px;
+  max-width: 700px;
+  margin: auto;
+  border-radius: 12px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+label {
+  display: block;
+  margin-top: 10px;
+}
+input {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 10px;
+}
+button {
+  background: #007BFF;
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+#statusPanel {
+  margin-top: 15px;
+  font-weight: bold;
+}
+pre {
+  background: #eee;
+  padding: 10px;
+  overflow-x: auto;
+}
+
+/* Modal window */
+#browserModal {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+  font-family: sans-serif;
+  color: #333;
+}
+
+/* Modal header */
+#browserModal > div:first-child {
+  display: flex;
+  justify-content: flex-end;
+  padding: 5px;
+}
+
+/* Close button */
+#browserModal button {
+  background: none;
+  border: none;
+  font-size: 1.4em;
+  color: #888;
+  cursor: pointer;
+}
+
+#browserModal button:hover {
+  color: #000;
+}
+
+/* Folder content */
+#browserContent {
+  padding: 20px;
+  max-height: 90%;
+  overflow-y: auto;
+}
+
+#browserContent div {
+  padding: 6px 10px;
+  border-bottom: 1px solid #eee;
+}
+
+#browserContent a {
+  color: #007BFF;
+  font-weight: 500;
+  text-decoration: none;
+  display: inline-block;
+  width: 100%;
+}
+
+#browserContent a:hover {
+  text-decoration: underline;
+}
+
+#browserContent button {
+  background-color: #007BFF;
+  color: white;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 6px;
+  font-size: 14px;
+  margin-top: 20px;
+  cursor: pointer;
+}
+
+#browserContent button:hover {
+  background-color: #0056b3;
+}
