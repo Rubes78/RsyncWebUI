@@ -1,4 +1,4 @@
 {
-  "source": "/Quarks/DockerCompose/BookStack",
+  "source": "/Quarks/DockerCompose",
   "destination": "/USB"
 }
