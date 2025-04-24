@@ -161,3 +161,8 @@ pre {
   color: #721c24;
   border-bottom: 2px solid #f5c6cb;
 }
+
+
+#historyTable tr.highlight {
+  background-color: #d4edda !important;
+}

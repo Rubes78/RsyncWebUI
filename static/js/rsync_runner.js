@@ -16,6 +16,17 @@ async function loadHistory() {
       <td><button onclick="rerunJob('${job.source}', '${job.destination}', '${job.options}')">Re-run</button></td>
     </tr>
   `).join('');
+
+  console.log("Highlighting most recent row...");
+
+  const firstRow = tableBody.querySelector('tr');
+  if (firstRow) {
+    tableBody.querySelectorAll('tr').forEach(row => row.classList.remove('highlight'));
+    firstRow.classList.add('highlight');
+    console.log("Applied .highlight class to:", firstRow);
+  } else {
+    console.log("No row found to highlight.");
+  }
 }
 
 async function loadSavedPaths() {
@@ -50,9 +61,9 @@ document.getElementById('rsyncForm').addEventListener('submit', async function(e
   const res = await fetch('/run_rsync', { method: 'POST', body: formData });
   const result = await res.json();
   document.getElementById('rsyncOutput').innerText = result.stdout + "\n" + result.stderr;
-  
-panel.innerText = "Job Completed";
-const now = new Date();
+
+  panel.innerText = "Job Completed";
+  const now = new Date();
   const formatted = now.toLocaleTimeString();
   const notification = document.getElementById('notificationBar');
   notification.className = 'success';
