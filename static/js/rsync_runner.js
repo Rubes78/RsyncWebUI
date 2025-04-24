@@ -52,11 +52,13 @@ document.getElementById('rsyncForm').addEventListener('submit', async function(e
   document.getElementById('rsyncOutput').innerText = result.stdout + "\n" + result.stderr;
   
 panel.innerText = "Job Completed";
-const notification = document.getElementById('notificationBar');
-notification.className = 'success';
-notification.innerText = "✅ Sync completed successfully.";
-notification.style.display = 'block';
-setTimeout(() => { notification.style.display = 'none'; }, 5000);
+const now = new Date();
+  const formatted = now.toLocaleTimeString();
+  const notification = document.getElementById('notificationBar');
+  notification.className = 'success';
+  notification.innerText = `✅ Synced: ${source} → ${destination} at ${formatted}`;
+  notification.style.display = 'block';
+  setTimeout(() => { notification.style.display = 'none'; }, 10000);
 
   loadHistory();
 });

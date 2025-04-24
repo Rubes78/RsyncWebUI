@@ -214,5 +214,32 @@
     "stdout": "sending incremental file list\n\nsent 4.34K bytes  received 49 bytes  8.78K bytes/sec\ntotal size is 310.24K  speedup is 70.69\n",
     "stderr": "",
     "returncode": 0
+  },
+  {
+    "timestamp": "2025-04-24T10:19:09.669041-05:00",
+    "source": "/Quarks/DockerCompose",
+    "destination": "/USB",
+    "options": "-avh --progress",
+    "stdout": "sending incremental file list\n\nsent 4.34K bytes  received 49 bytes  8.78K bytes/sec\ntotal size is 310.24K  speedup is 70.69\n",
+    "stderr": "",
+    "returncode": 0
+  },
+  {
+    "timestamp": "2025-04-24T10:30:30.124037-05:00",
+    "source": "/Quarks/DockerCompose",
+    "destination": "/USB",
+    "options": "-avh --progress",
+    "stdout": "sending incremental file list\n\nsent 4.34K bytes  received 49 bytes  8.78K bytes/sec\ntotal size is 310.24K  speedup is 70.69\n",
+    "stderr": "",
+    "returncode": 0
+  },
+  {
+    "timestamp": "2025-04-24T10:32:13.635980-05:00",
+    "source": "/Quarks/DockerCompose",
+    "destination": "/USB",
+    "options": "-avh --progress",
+    "stdout": "sending incremental file list\n\nsent 4.34K bytes  received 49 bytes  8.78K bytes/sec\ntotal size is 310.24K  speedup is 70.69\n",
+    "stderr": "",
+    "returncode": 0
   }
 ]
