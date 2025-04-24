@@ -9,17 +9,27 @@ async function loadHistory() {
 
   
 tableBody.innerHTML = jobs.map((job, index) => {
-  const rowClass = index === 0 && job.returncode !== 0 ? 'error-highlight' : (index === 0 ? 'highlight' : '');
-  return `
-    <tr class="${rowClass}">
-      <td>${new Date(job.timestamp).toLocaleString()}</td>
-      <td>${job.source}</td>
-      <td>${job.destination}</td>
-      <td>${job.options}</td>
-      <td><button onclick="rerunJob('${job.source}', '${job.destination}', '${job.options}')">Re-run</button></td>
-    </tr>
-  `;
-}).join('');
+    const rowClass = index === 0 && job.returncode !== 0 ? 'error-highlight' : (index === 0 ? 'highlight' : '');
+    const detailId = `details-${index}`;
+    return `
+      <tr class="${rowClass}">
+        <td>${new Date(job.timestamp).toLocaleString()}</td>
+        <td>${job.source}</td>
+        <td>${job.destination}</td>
+        <td>${job.options}</td>
+        <td>
+          <button onclick="rerunJob('${job.source}', '${job.destination}', '${job.options}')">Re-run</button><br>
+          <button onclick="toggleDetails('${detailId}')">View Details</button>
+        </td>
+      </tr>
+      <tr id="${detailId}" class="details-content" style="display: none;">
+        <td colspan="5">
+          <div><strong>Output:</strong><br>${job.stdout || "No output"}</div>
+          <div><strong>Error:</strong><br>${job.stderr || "None"}</div>
+        </td>
+      </tr>
+    `;
+  }).join('');
     
 
   console.log("Highlighting most recent row...");
@@ -90,3 +100,9 @@ window.onload = function() {
   loadSavedPaths();
   loadHistory();
 };
+
+
+function toggleDetails(id) {
+  const row = document.getElementById(id);
+  row.style.display = (row.style.display === 'table-row') ? 'none' : 'table-row';
+}
