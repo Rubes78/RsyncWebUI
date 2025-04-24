@@ -50,7 +50,14 @@ document.getElementById('rsyncForm').addEventListener('submit', async function(e
   const res = await fetch('/run_rsync', { method: 'POST', body: formData });
   const result = await res.json();
   document.getElementById('rsyncOutput').innerText = result.stdout + "\n" + result.stderr;
-  panel.innerText = "Job Completed";
+  
+panel.innerText = "Job Completed";
+const notification = document.getElementById('notificationBar');
+notification.className = 'success';
+notification.innerText = "✅ Sync completed successfully.";
+notification.style.display = 'block';
+setTimeout(() => { notification.style.display = 'none'; }, 5000);
+
   loadHistory();
 });
 
