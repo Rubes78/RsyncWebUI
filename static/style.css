@@ -107,3 +107,33 @@ pre {
 #browserContent button:hover {
   background-color: #0056b3;
 }
+
+
+#historyTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+}
+#historyTable th, #historyTable td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: left;
+}
+#historyTable th {
+  background-color: #f8f8f8;
+}
+#historyTable tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+#historyTable button {
+  padding: 6px 10px;
+  font-size: 14px;
+  border: none;
+  background-color: #007BFF;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+}
+#historyTable button:hover {
+  background-color: #0056b3;
+}
