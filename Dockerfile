@@ -1,16 +1,17 @@
-# RsyncWebUI Minimal Dockerfile
-
 FROM python:3.11-slim
 
 WORKDIR /app
 
-# Install rsync and Flask
+# Install dependencies
 RUN apt-get update && apt-get install -y rsync && \
     pip install flask && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Expose Flask app port
+# Copy source files
+COPY . /app
+
+# Expose the Flask port
 EXPOSE 5050
 
-# Run the app
+# Run the application
 CMD ["python", "rsync_web_browser.py"]

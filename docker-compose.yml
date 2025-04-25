@@ -10,8 +10,6 @@ services:
     environment:
       - FLASK_APP=rsync_web_browser.py
       - FLASK_ENV=production
-      - PUID=${PUID}
-      - PGID=${PGID}
     volumes:
       - ${DOCKER_PATH}:/app/config
       - ${DATA_PATH}:/mnt/data/Quarks
