@@ -1,0 +1,18 @@
+version: "3.8"
+
+services:
+  rsyncwebui:
+    build: .
+    container_name: rsyncwebui
+    ports:
+      - "5050:5050"
+    environment:
+      - FLASK_APP=rsync_web_browser.py
+      - FLASK_ENV=production
+      - PUID=${PUID}
+      - PGID=${PGID}
+    volumes:
+      - ${DOCKER_PATH}/rsyncwebui/config:/app/config
+      - ${DATA_PATH}:/mnt/data/Quarks
+      - ${USB_PATH}:/mnt/data/USB
+    restart: unless-stopped
