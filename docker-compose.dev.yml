@@ -3,13 +3,13 @@ version: "3.8"
 services:
   rsyncwebui:
     build:
-      context: https://github.com/Rubes78/RsyncWebUI.git#docker
+      context: /Quarks/GitHub/RsyncWebUI
     container_name: rsyncwebui
     ports:
       - "5050:5050"
     environment:
       - FLASK_APP=rsync_web_browser.py
-      - FLASK_ENV=production
+      - FLASK_ENV=development
       - PUID=${PUID}
       - PGID=${PGID}
     volumes:
