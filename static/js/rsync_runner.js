@@ -4,11 +4,9 @@ async function loadHistory() {
   const jobs = await res.json();
   const tableBody = document.querySelector('#historyTable tbody');
 
-  // Sort by most recent first
   jobs.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
 
-  
-tableBody.innerHTML = jobs.map((job, index) => {
+  tableBody.innerHTML = jobs.map((job, index) => {
     const rowClass = index === 0 && job.returncode !== 0 ? 'error-highlight' : (index === 0 ? 'highlight' : '');
     const detailId = `details-${index}`;
     return `
@@ -30,18 +28,6 @@ tableBody.innerHTML = jobs.map((job, index) => {
       </tr>
     `;
   }).join('');
-    
-
-  console.log("Highlighting most recent row...");
-
-  const firstRow = tableBody.querySelector('tr');
-  if (firstRow) {
-    tableBody.querySelectorAll('tr').forEach(row => row.classList.remove('highlight'));
-    firstRow.classList.add('highlight');
-    console.log("Applied .highlight class to:", firstRow);
-  } else {
-    console.log("No row found to highlight.");
-  }
 }
 
 async function loadSavedPaths() {
@@ -72,37 +58,39 @@ document.getElementById('rsyncForm').addEventListener('submit', async function(e
 
   const panel = document.getElementById('statusPanel');
   panel.innerText = "Syncing...";
+  const output = document.getElementById('rsyncOutput');
+  output.innerText = "";
+
   const formData = new FormData(this);
-  const res = await fetch('/run_rsync', { method: 'POST', body: formData });
-  const result = await res.json();
-  document.getElementById('rsyncOutput').innerText = result.stdout + "\n" + result.stderr;
+  const res = await fetch('/run_rsync_stream', { method: 'POST', body: formData });
+  const reader = res.body.getReader();
+  const decoder = new TextDecoder();
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    output.innerText += decoder.decode(value, { stream: true });
+    output.scrollTop = output.scrollHeight;
+  }
 
   panel.innerText = "Job Completed";
   const now = new Date();
   const formatted = now.toLocaleTimeString();
   const notification = document.getElementById('notificationBar');
-  
-  if (result.returncode === 0) {
-    notification.className = 'success';
-    notification.innerText = `✅ Synced: ${source} → ${destination} at ${formatted}`;
-  } else {
-    notification.className = 'error';
-    notification.innerText = `❌ Sync failed: ${result.stderr || "Unknown error"}`;
-  }
+  notification.className = 'success';
+  notification.innerText = `✅ Sync complete at ${formatted}`;
   notification.style.display = 'block';
-    
   setTimeout(() => { notification.style.display = 'none'; }, 10000);
 
   loadHistory();
 });
 
-window.onload = function() {
-  loadSavedPaths();
-  loadHistory();
-};
-
-
 function toggleDetails(id) {
   const row = document.getElementById(id);
   row.style.display = (row.style.display === 'table-row') ? 'none' : 'table-row';
 }
+
+window.onload = function() {
+  loadSavedPaths();
+  loadHistory();
+};
