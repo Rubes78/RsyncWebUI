@@ -2,7 +2,8 @@ version: "3.8"
 
 services:
   rsyncwebui:
-    build: .
+    build:
+      context: https://github.com/Rubes78/RsyncWebUI.git#docker
     container_name: rsyncwebui
     ports:
       - "5050:5050"
@@ -12,7 +13,7 @@ services:
       - PUID=${PUID}
       - PGID=${PGID}
     volumes:
-      - ${DOCKER_PATH}/rsyncwebui/config:/app/config
+      - ${DOCKER_PATH}:/app
       - ${DATA_PATH}:/mnt/data/Quarks
       - ${USB_PATH}:/mnt/data/USB
     restart: unless-stopped

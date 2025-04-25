@@ -13,6 +13,7 @@ async function loadHistory() {
     const detailId = `details-${index}`;
     return `
       <tr class="${rowClass}">
+        <td><input type="checkbox" class="history-checkbox" data-index="${index}"></td>
         <td>${new Date(job.timestamp).toLocaleString()}</td>
         <td>${job.source}</td>
         <td>${job.destination}</td>
@@ -23,13 +24,33 @@ async function loadHistory() {
         </td>
       </tr>
       <tr id="${detailId}" class="details-content" style="display: none;">
-        <td colspan="5">
+        <td colspan="6">
           <div><strong>Output:</strong><br>${job.stdout || "No output"}</div>
           <div><strong>Error:</strong><br>${job.stderr || "None"}</div>
         </td>
       </tr>
     `;
   }).join('');
+}
+
+async function deleteSelectedHistory() {
+  const checked = Array.from(document.querySelectorAll('.history-checkbox:checked'));
+  const indices = checked.map(cb => parseInt(cb.getAttribute('data-index')));
+  if (indices.length === 0) {
+    alert("No entries selected.");
+    return;
+  }
+
+  const confirmDelete = confirm(`Delete ${indices.length} selected entr${indices.length === 1 ? 'y' : 'ies'}?`);
+  if (!confirmDelete) return;
+
+  await fetch('/delete_history', {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ indices })
+  });
+
+  loadHistory();
 }
 
 async function loadSavedPaths() {
@@ -68,7 +89,7 @@ document.getElementById('rsyncForm').addEventListener('submit', async function(e
   const decoder = new TextDecoder();
   let logLines = [];
 
-  output.innerText = ""; // Clear log but don't force display
+  output.innerText = "";
 
   while (true) {
     const { done, value } = await reader.read();
@@ -116,9 +137,16 @@ function toggleOutputVisibility() {
 window.onload = function() {
   loadSavedPaths();
   loadHistory();
+
   const outputToggle = document.createElement("button");
   outputToggle.innerText = "Hide Sync Log";
   outputToggle.id = "outputToggle";
   outputToggle.onclick = toggleOutputVisibility;
   document.getElementById("rsyncOutput").insertAdjacentElement("beforebegin", outputToggle);
+
+  const deleteBtn = document.createElement("button");
+  deleteBtn.innerText = "Delete Selected";
+  deleteBtn.style.marginLeft = "10px";
+  deleteBtn.onclick = deleteSelectedHistory;
+  document.getElementById("historyTable").insertAdjacentElement("beforebegin", deleteBtn);
 };
