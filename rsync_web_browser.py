@@ -75,5 +75,23 @@ def run_rsync_stream():
 
     return Response(generate(), mimetype="text/plain")
 
+
+@app.route("/create_folder", methods=["POST"])
+def create_folder():
+    data = request.get_json()
+    parent = data.get("parent", "/")
+    name = data.get("name", "").strip()
+
+    if not name:
+        return jsonify(success=False, error="Folder name is required")
+
+    full_path = os.path.join(parent, name)
+    try:
+        os.makedirs(full_path, exist_ok=False)
+        return jsonify(success=True)
+    except Exception as e:
+        return jsonify(success=False, error=str(e))
+
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5050, debug=True)

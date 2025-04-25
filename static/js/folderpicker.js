@@ -14,7 +14,13 @@ function loadBrowser(path) {
     .then(data => {
       currentBrowsePath = data.current;
       const content = document.getElementById("browserContent");
-      content.innerHTML = "<h3>" + data.current + "</h3>";
+      content.innerHTML = "";
+
+      content.appendChild(createButtonRow());
+
+      const header = document.createElement("h3");
+      header.textContent = data.current;
+      content.appendChild(header);
 
       if (data.current !== "/") {
         const upDiv = document.createElement("div");
@@ -32,26 +38,57 @@ function loadBrowser(path) {
         }
       });
 
-      const buttonRow = document.createElement("div");
-      buttonRow.style.marginTop = "20px";
+      content.appendChild(createButtonRow());
 
-      const selectBtn = document.createElement("button");
-      selectBtn.textContent = "Use This Folder";
-      selectBtn.onclick = () => {
-        document.getElementById(currentFieldId).value = currentBrowsePath;
-        closeBrowserModal();
-      };
-      buttonRow.appendChild(selectBtn);
-
-      const cancelBtn = document.createElement("button");
-      cancelBtn.textContent = "Cancel";
-      cancelBtn.style.marginLeft = "10px";
-      cancelBtn.onclick = () => closeBrowserModal();
-      buttonRow.appendChild(cancelBtn);
-
-      content.appendChild(buttonRow);
       document.getElementById("browserModal").style.display = "block";
     });
+}
+
+function createButtonRow() {
+  const buttonRow = document.createElement("div");
+  buttonRow.style.marginTop = "10px";
+  buttonRow.style.marginBottom = "10px";
+
+  const selectBtn = document.createElement("button");
+  selectBtn.textContent = "Use This Folder";
+  selectBtn.onclick = () => {
+    document.getElementById(currentFieldId).value = currentBrowsePath;
+    closeBrowserModal();
+  };
+  buttonRow.appendChild(selectBtn);
+
+  const cancelBtn = document.createElement("button");
+  cancelBtn.textContent = "Cancel";
+  cancelBtn.style.marginLeft = "10px";
+  cancelBtn.onclick = () => closeBrowserModal();
+  buttonRow.appendChild(cancelBtn);
+
+  const createBtn = document.createElement("button");
+  createBtn.textContent = "Create Folder";
+  createBtn.style.marginLeft = "10px";
+  createBtn.onclick = () => {
+    const folderName = prompt("Enter new folder name:");
+    if (folderName) {
+      fetch("/create_folder", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ parent: currentBrowsePath, name: folderName })
+      })
+      .then(res => res.json())
+      .then(result => {
+        if (result.success) {
+          const newPath = currentBrowsePath.replace(/\/+$/, '') + '/' + folderName;
+          document.getElementById(currentFieldId).value = newPath;
+          closeBrowserModal();
+        } else {
+          alert("Failed to create folder: " + result.error);
+        }
+      });
+    }
+  };
+  buttonRow.appendChild(createBtn);
+
+  return buttonRow;
 }
 
 function closeBrowserModal() {
