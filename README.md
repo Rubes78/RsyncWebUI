@@ -1,90 +1,131 @@
-# RsyncWebUI
+# RsyncWebUI 🚀
 
-A lightweight, browser-based interface to run and manage `rsync` jobs.  
-Perfect for syncing folders across local systems with visual control, history, and logging.
-
----
-
-## 🚀 Features
-
-- 🔍 Browse & select source/destination paths from root
-- ⚙️ Configure rsync options (`-avh`, `--progress`, etc.)
-- 🕘 View full sync history
-- ✅ Re-run any previous job
-- 📁 Create folders directly within the browser modal
-- ✅ Auto-select newly created folders
-- ✅ Live sync log with show/hide toggle
-- 📉 Log output truncated to last 100 lines (for clarity)
-- ✅ Sync notification bar with timestamp
-- 🗑 Select & delete sync history entries
-- ☑ Select-all checkbox with header toggle
-- 🔁 Restartable via `run_webui.sh`
+RsyncWebUI is a web-based tool that makes it easy to synchronize folders across directories using `rsync`.  
+It features a modern UI with live folder browsing, job history, and configurable sync options — all running inside a lightweight Docker container.
 
 ---
 
-## 📦 How to Run
+## ✨ Features at a Glance
+- Live browse your server directories
+- Choose source and destination folders
+- Customize rsync options
+- Real-time sync output with live status
+- View full sync history
+- Re-run previous jobs
+- Create new folders during browsing
+- Dockerized for easy deployment!
 
-### 1. Start the Web UI
+---
 
+## 🛠 Requirements
+- Docker installed (v20.10+)
+- Docker Compose installed (v2+)
+- Basic familiarity with local folders you want to sync
+
+---
+
+## 📦 Installation & Setup
+
+### 1. Clone or pull the RsyncWebUI repository
 ```bash
-./run_webui.sh
+git clone https://github.com/Rubes78/RsyncWebUI.git
+cd RsyncWebUI
 ```
 
-🔗 Opens at: [http://localhost:5050](http://localhost:5050)  
-or your LAN IP (e.g. `http://192.168.x.x:5050`)
-
-### 2. Command Options
-
-| Command                | Description                    |
-|------------------------|--------------------------------|
-| `./run_webui.sh`       | Start the app silently         |
-| `./run_webui.sh --stop`| Stop the background server     |
-| `./run_webui.sh --restart` | Stop and restart the server     |
+> Or simply use the provided `docker-compose.yml` to pull directly!
 
 ---
 
-## 📂 Folder Structure
+### 2. Configure `.env` File
 
-```text
-.
-├── rsync_web_browser.py     # Flask server
-├── templates/
-│   └── select.html          # Web UI HTML
-├── static/
-│   ├── js/
-│   │   ├── folderpicker.js
-│   │   └── rsync_runner.js
-│   └── style.css            # UI styling
-├── sync_history.json        # Job log (auto-managed)
-├── saved_paths.json         # Remembers last used paths
-├── run_webui.sh             # Start/Stop/Restart script
+Example `.env`:
+```env
+DATA_PATH=/Quarks
+USB_PATH=/USB
+DOCKER_PATH=/HoloMedia/Dockers/rsyncwebui
+PUID=1000
+PGID=1000
+```
+
+- `DATA_PATH`: Path to your first source folder (like /Quarks)
+- `USB_PATH`: Path to your second source (like external drive /USB)
+- `DOCKER_PATH`: Where to store RsyncWebUI's runtime config
+- `PUID/PGID`: User and Group IDs for Docker permissions
+
+---
+
+### 3. Launch the WebUI
+
+#### For Developers (local builds):
+```bash
+docker compose -f docker-compose.dev.yml --env-file .env up --build
+```
+
+#### For Testers / Friends (GitHub Pull):
+```bash
+docker compose --env-file .env up --build
+```
+
+Then open your browser:
+```
+http://localhost:5050
+```
+
+✅ You'll see the RsyncWebUI interface ready to go!
+
+---
+
+## 📂 Accessing Host Folders
+The Docker container mounts your `DATA_PATH` and `USB_PATH` into `/mnt/data/Quarks` and `/mnt/data/USB` respectively.  
+You can browse, sync, and manage these folders from the web interface.
+
+---
+
+## ⚙️ Managing the Container
+
+- Stop the WebUI:
+  ```bash
+  docker compose down
+  ```
+
+- Rebuild after updates:
+  ```bash
+  docker compose up --build
+  ```
+
+- Restart cleanly:
+  ```bash
+  docker compose down && docker compose up --build
+  ```
+
+---
+
+## 🧹 Cleaning Up
+
+Delete containers and images:
+```bash
+docker compose down --rmi all --volumes
 ```
 
 ---
 
-## ✅ Requirements
+## 🏁 Quick Git Push Commands
 
-- Python 3.7+
-- Flask (`pip install flask`)
+Located in:
+```
+GIT_PUSH_COMMANDS.txt
+```
 
----
-
-## 🛡️ Notes
-
-- This version is for **testing/dev only** – not secured for production
-- Sync history is stored in JSON locally
-- rsync must be installed and available in system PATH
+Follow it to quickly update GitHub after changes!
 
 ---
 
-## 🧠 Roadmap
-
-- 🔐 Add authentication
-- 💾 Export/import sync configs
-- 📈 Real-time sync progress bar
+## 🔥 Project Status
+- Actively developed
+- Dockerized deployment completed
+- Feature-rich, simple UI
+- Open to contributions!
 
 ---
 
-## 📜 License
-
-MIT — use freely and customize.
+Happy syncing! 🚀
