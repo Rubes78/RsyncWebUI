@@ -1,4 +1,6 @@
 
+let logVisible = true;
+
 async function loadHistory() {
   const res = await fetch('/history');
   const jobs = await res.json();
@@ -59,17 +61,30 @@ document.getElementById('rsyncForm').addEventListener('submit', async function(e
   const panel = document.getElementById('statusPanel');
   panel.innerText = "Syncing...";
   const output = document.getElementById('rsyncOutput');
-  output.innerText = "";
-
   const formData = new FormData(this);
+
   const res = await fetch('/run_rsync_stream', { method: 'POST', body: formData });
   const reader = res.body.getReader();
   const decoder = new TextDecoder();
+  let logLines = [];
+
+  output.innerText = ""; // Clear log but don't force display
 
   while (true) {
     const { done, value } = await reader.read();
     if (done) break;
-    output.innerText += decoder.decode(value, { stream: true });
+    const chunk = decoder.decode(value, { stream: true });
+    const newLines = chunk.split("\n");
+    logLines.push(...newLines);
+    if (logLines.length > 100) logLines = logLines.slice(-100);
+    if (logVisible) {
+      output.innerText = logLines.join("\n");
+      output.scrollTop = output.scrollHeight;
+    }
+  }
+
+  if (logVisible) {
+    output.innerText = logLines.join("\n");
     output.scrollTop = output.scrollHeight;
   }
 
@@ -90,7 +105,20 @@ function toggleDetails(id) {
   row.style.display = (row.style.display === 'table-row') ? 'none' : 'table-row';
 }
 
+function toggleOutputVisibility() {
+  const output = document.getElementById('rsyncOutput');
+  const toggle = document.getElementById('outputToggle');
+  logVisible = !logVisible;
+  output.style.display = logVisible ? "block" : "none";
+  toggle.innerText = logVisible ? "Hide Sync Log" : "Show Sync Log";
+}
+
 window.onload = function() {
   loadSavedPaths();
   loadHistory();
+  const outputToggle = document.createElement("button");
+  outputToggle.innerText = "Hide Sync Log";
+  outputToggle.id = "outputToggle";
+  outputToggle.onclick = toggleOutputVisibility;
+  document.getElementById("rsyncOutput").insertAdjacentElement("beforebegin", outputToggle);
 };
