@@ -130,7 +130,7 @@ document.getElementById('rsyncForm').addEventListener('submit', async function(e
   notification.style.display = 'block';
   setTimeout(() => { notification.style.display = 'none'; }, 10000);
 
-  loadHistory();
+  await loadHistory(); // <--- ADD THIS BACK to refresh table after sync
 });
 
 window.onload = function() {
