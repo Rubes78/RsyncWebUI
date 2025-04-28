@@ -45,12 +45,24 @@ USB_PATH=/USB
 DOCKER_PATH=/HoloMedia/Dockers/rsyncwebui
 PUID=1000
 PGID=1000
+# Optional configuration variables
+# CONFIG_PATH=/app/config
+# HISTORY_FILENAME=sync_history.json
+# PATHS_FILENAME=saved_paths.json
+# BROWSE_ROOT=/mnt/data
 ```
 
+Required variables:
 - `DATA_PATH`: Path to your first source folder (like /Quarks)
 - `USB_PATH`: Path to your second source (like external drive /USB)
 - `DOCKER_PATH`: Where to store RsyncWebUI's runtime config
 - `PUID/PGID`: User and Group IDs for Docker permissions
+
+Optional configuration variables:
+- `CONFIG_PATH`: Directory for persistent JSON files (default: /app/config)
+- `HISTORY_FILENAME`: Filename for sync history (default: sync_history.json)
+- `PATHS_FILENAME`: Filename for saved paths (default: saved_paths.json)
+- `BROWSE_ROOT`: Root directory for file browsing (default: /mnt/data)
 
 ---
 
@@ -76,8 +88,18 @@ http://localhost:5050
 ---
 
 ## 📂 Accessing Host Folders
-The Docker container mounts your `DATA_PATH` and `USB_PATH` into `/mnt/data/Quarks` and `/mnt/data/USB` respectively.  
+The Docker container mounts your `DATA_PATH` and `USB_PATH` into `/mnt/data/Quarks` and `/mnt/data/USB` respectively.
 You can browse, sync, and manage these folders from the web interface.
+
+---
+
+## 💾 Persistent Storage
+RsyncWebUI stores your sync history and saved paths in JSON files located in the mounted volume specified by `DOCKER_PATH` (mapped to `/app/config` inside the container). This ensures your data persists across container restarts and updates.
+
+- `sync_history.json`: Contains a record of all your sync operations
+- `saved_paths.json`: Stores your saved source and destination paths
+
+You can customize the location and filenames of these files using the environment variables described in the configuration section.
 
 ---
 
@@ -124,6 +146,7 @@ Follow it to quickly update GitHub after changes!
 - Actively developed
 - Dockerized deployment completed
 - Feature-rich, simple UI
+- Configurable persistent storage for settings and history
 - Open to contributions!
 
 ---

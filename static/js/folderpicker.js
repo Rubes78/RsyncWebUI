@@ -72,7 +72,7 @@ function createButtonRow() {
       fetch("/create_folder", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ parent: currentBrowsePath, name: folderName })
+        body: JSON.stringify({ path: currentBrowsePath, name: folderName })
       })
       .then(res => res.json())
       .then(result => {

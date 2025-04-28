@@ -5,9 +5,24 @@ from datetime import datetime
 
 app = Flask(__name__, static_url_path='/static', static_folder='static', template_folder='templates')
 
-HISTORY_FILE = Path("sync_history.json")
-PATHS_FILE = Path("saved_paths.json")
-BROWSE_ROOT = "/mnt/data"
+# Configuration using environment variables with sensible defaults
+# CONFIG_PATH: Directory for persistent JSON files (default: /app/config in Docker, current dir otherwise)
+# HISTORY_FILENAME: Filename for sync history (default: sync_history.json)
+# PATHS_FILENAME: Filename for saved paths (default: saved_paths.json)
+# BROWSE_ROOT: Root directory for file browsing (default: /mnt/data)
+
+default_config_dir = "/app/config" if Path("/app/config").exists() or os.environ.get("FLASK_ENV") else "."
+CONFIG_DIR = Path(os.environ.get("CONFIG_PATH", default_config_dir))
+CONFIG_DIR.mkdir(exist_ok=True)  # Ensure the directory exists
+
+HISTORY_FILE = CONFIG_DIR / os.environ.get("HISTORY_FILENAME", "sync_history.json")
+PATHS_FILE = CONFIG_DIR / os.environ.get("PATHS_FILENAME", "saved_paths.json")
+BROWSE_ROOT = os.environ.get("BROWSE_ROOT", "/mnt/data")
+
+print(f"Using config directory: {CONFIG_DIR.absolute()}")
+print(f"History file: {HISTORY_FILE}")
+print(f"Paths file: {PATHS_FILE}")
+print(f"Browse root: {BROWSE_ROOT}")
 
 @app.route("/")
 def index():
