@@ -3,8 +3,8 @@ version: "3.8"
 services:
   rsyncwebui:
     build:
-      #context: https://github.com/Rubes78/RsyncWebUI.git#docker
-      context: /Quarks/DevOps/RsyncWebUI
+      #context: https://github.com/Rubes78/RsyncWebUI.git
+      context: /Quarks/Data/DevOps/RsyncWebUI
     container_name: rsyncwebui
     ports:
       - "5050:5050"
