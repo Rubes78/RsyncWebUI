@@ -1,7 +1,15 @@
 from flask import Flask, render_template, request, jsonify
-import subprocess, json, os
+import subprocess, json, os, uuid, time, threading
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, timedelta
+
+# Try to import schedule, but don't fail if it's not available
+try:
+    import schedule
+    SCHEDULER_AVAILABLE = True
+except ImportError:
+    SCHEDULER_AVAILABLE = False
+    print("Warning: 'schedule' module not found. Scheduling functionality will be disabled.")
 
 app = Flask(__name__, static_url_path='/static', static_folder='static', template_folder='templates')
 
@@ -17,16 +25,25 @@ CONFIG_DIR.mkdir(exist_ok=True)  # Ensure the directory exists
 
 HISTORY_FILE = CONFIG_DIR / os.environ.get("HISTORY_FILENAME", "sync_history.json")
 PATHS_FILE = CONFIG_DIR / os.environ.get("PATHS_FILENAME", "saved_paths.json")
+SCHEDULED_JOBS_FILE = CONFIG_DIR / os.environ.get("SCHEDULED_JOBS_FILENAME", "scheduled_jobs.json")
 BROWSE_ROOT = os.environ.get("BROWSE_ROOT", "/mnt/data")
 
 print(f"Using config directory: {CONFIG_DIR.absolute()}")
 print(f"History file: {HISTORY_FILE}")
 print(f"Paths file: {PATHS_FILE}")
+print(f"Scheduled jobs file: {SCHEDULED_JOBS_FILE}")
 print(f"Browse root: {BROWSE_ROOT}")
+
+# Global variable to store the scheduler thread
+scheduler_thread = None
 
 @app.route("/")
 def index():
     return render_template("select.html")
+
+@app.route("/schedule")
+def schedule_page():
+    return render_template("schedule.html")
 
 @app.route("/run_rsync_stream", methods=["POST"])
 def run_rsync_stream():
@@ -118,5 +135,214 @@ def delete_history():
     HISTORY_FILE.write_text(json.dumps(history, indent=2))
     return jsonify(success=True)
 
+@app.route("/scheduled_jobs", methods=["GET"])
+def get_scheduled_jobs():
+    if SCHEDULED_JOBS_FILE.exists():
+        return jsonify(json.loads(SCHEDULED_JOBS_FILE.read_text()))
+    return jsonify([])
+
+@app.route("/schedule_job", methods=["POST"])
+def schedule_job():
+    try:
+        job_data = request.json
+        
+        # Generate a unique ID for the job
+        job_data["id"] = str(uuid.uuid4())
+        
+        # Add creation timestamp
+        job_data["created_at"] = datetime.now().astimezone().isoformat()
+        
+        # Load existing jobs
+        jobs = []
+        if SCHEDULED_JOBS_FILE.exists():
+            jobs = json.loads(SCHEDULED_JOBS_FILE.read_text())
+        
+        # Add the new job
+        jobs.append(job_data)
+        
+        # Save jobs back to file
+        SCHEDULED_JOBS_FILE.write_text(json.dumps(jobs, indent=2))
+        
+        # Update the scheduler
+        update_scheduler()
+        
+        return jsonify({"success": True, "id": job_data["id"]})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)})
+
+@app.route("/delete_scheduled_job", methods=["POST"])
+def delete_scheduled_job():
+    try:
+        job_id = request.json.get("id")
+        
+        if not SCHEDULED_JOBS_FILE.exists():
+            return jsonify({"success": False, "error": "No scheduled jobs found"})
+        
+        # Load existing jobs
+        jobs = json.loads(SCHEDULED_JOBS_FILE.read_text())
+        
+        # Filter out the job to delete
+        jobs = [job for job in jobs if job.get("id") != job_id]
+        
+        # Save jobs back to file
+        SCHEDULED_JOBS_FILE.write_text(json.dumps(jobs, indent=2))
+        
+        # Update the scheduler
+        update_scheduler()
+        
+        return jsonify({"success": True})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)})
+
+@app.route("/delete_scheduled_jobs", methods=["POST"])
+def delete_scheduled_jobs():
+    try:
+        job_ids = request.json.get("ids", [])
+        
+        if not SCHEDULED_JOBS_FILE.exists():
+            return jsonify({"success": False, "error": "No scheduled jobs found"})
+        
+        # Load existing jobs
+        jobs = json.loads(SCHEDULED_JOBS_FILE.read_text())
+        
+        # Filter out the jobs to delete
+        jobs = [job for job in jobs if job.get("id") not in job_ids]
+        
+        # Save jobs back to file
+        SCHEDULED_JOBS_FILE.write_text(json.dumps(jobs, indent=2))
+        
+        # Update the scheduler
+        update_scheduler()
+        
+        return jsonify({"success": True})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)})
+
+def run_scheduled_rsync(job):
+    """Run an rsync job from a scheduled task"""
+    source = job["source"]
+    destination = job["destination"]
+    options = job["options"]
+    
+    abs_source = os.path.abspath(os.path.join(BROWSE_ROOT, source.lstrip("/")))
+    abs_dest = os.path.abspath(os.path.join(BROWSE_ROOT, destination.lstrip("/")))
+    
+    cmd = ["rsync"] + options.split() + [abs_source, abs_dest]
+    proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+    
+    output = ""
+    for line in iter(proc.stdout.readline, ''):
+        output += line
+    proc.stdout.close()
+    proc.wait()
+    
+    # Record in history
+    history = json.loads(HISTORY_FILE.read_text()) if HISTORY_FILE.exists() else []
+    
+    history_entry = {
+        "timestamp": datetime.now().astimezone().isoformat(),
+        "source": source,
+        "destination": destination,
+        "options": options,
+        "stdout": output,
+        "stderr": "",
+        "returncode": proc.returncode,
+        "scheduled": True,
+        "job_id": job.get("id", "unknown")
+    }
+    
+    history.insert(0, history_entry)
+    HISTORY_FILE.write_text(json.dumps(history, indent=2))
+    
+    return history_entry
+
+def update_scheduler():
+    """Update the scheduler with the current jobs"""
+    global scheduler_thread
+    
+    try:
+        # Import schedule here to avoid issues if the module is not available
+        import schedule
+        
+        # Clear all scheduled jobs
+        schedule.clear()
+        
+        if not SCHEDULED_JOBS_FILE.exists():
+            return
+        
+        jobs = json.loads(SCHEDULED_JOBS_FILE.read_text())
+        
+        for job in jobs:
+            if job["scheduleType"] == "once":
+                # Parse the datetime
+                run_time = datetime.fromisoformat(job["scheduleDateTime"].replace('Z', '+00:00'))
+                
+                # If the time is in the past, skip it
+                if run_time < datetime.now():
+                    continue
+                
+                # Schedule the job
+                schedule.once(run_time, run_scheduled_rsync, job)
+            else:
+                # Handle recurring jobs
+                if job["frequency"] == "hourly":
+                    interval = int(job["hourlyInterval"])
+                    schedule.every(interval).hours.do(run_scheduled_rsync, job)
+                
+                elif job["frequency"] == "daily":
+                    interval = int(job["dailyInterval"])
+                    time_parts = job["dailyTime"].split(":")
+                    hour, minute = int(time_parts[0]), int(time_parts[1])
+                    
+                    schedule.every(interval).days.at(f"{hour:02d}:{minute:02d}").do(run_scheduled_rsync, job)
+                
+                elif job["frequency"] == "weekly":
+                    interval = int(job["weeklyInterval"])
+                    time_parts = job["weeklyTime"].split(":")
+                    hour, minute = int(time_parts[0]), int(time_parts[1])
+                    
+                    for day in job["weekdays"]:
+                        day_name = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"][int(day)]
+                        getattr(schedule.every(interval).weeks, day_name).at(f"{hour:02d}:{minute:02d}").do(run_scheduled_rsync, job)
+                
+                elif job["frequency"] == "monthly":
+                    day = int(job["monthDay"])
+                    time_parts = job["monthlyTime"].split(":")
+                    hour, minute = int(time_parts[0]), int(time_parts[1])
+                    
+                    # This is a bit of a hack since schedule doesn't support monthly directly
+                    def monthly_job():
+                        now = datetime.now()
+                        target_day = day
+                        
+                        # If today is the target day and we haven't passed the time yet, run today
+                        if now.day == target_day and now.hour < hour or (now.hour == hour and now.minute < minute):
+                            run_scheduled_rsync(job)
+                    
+                    # Run the monthly check daily
+                    schedule.every().day.at(f"{hour:02d}:{minute:02d}").do(monthly_job)
+        
+        # Start the scheduler in a background thread if not already running
+        if scheduler_thread is None or not scheduler_thread.is_alive():
+            def run_scheduler():
+                while True:
+                    schedule.run_pending()
+                    time.sleep(60)  # Check every minute
+            
+            scheduler_thread = threading.Thread(target=run_scheduler, daemon=True)
+            scheduler_thread.start()
+    except ImportError:
+        print("Warning: 'schedule' module not found. Scheduling functionality will be disabled.")
+    except Exception as e:
+        print(f"Warning: Error initializing scheduler: {e}")
+
 if __name__ == "__main__":
+    # Initialize the scheduler if the schedule module is available
+    try:
+        update_scheduler()
+        print("Scheduler initialized successfully")
+    except Exception as e:
+        print(f"Warning: Could not initialize scheduler: {e}")
+        print("Scheduling functionality will be disabled")
+    
     app.run(host="0.0.0.0", port=5050)

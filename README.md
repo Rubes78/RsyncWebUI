@@ -13,6 +13,7 @@ It features a modern UI with live folder browsing, job history, and configurable
 - View full sync history
 - Re-run previous jobs
 - Create new folders during browsing
+- **Schedule one-time or recurring sync jobs**
 - Dockerized for easy deployment!
 
 ---
@@ -62,6 +63,7 @@ Optional configuration variables:
 - `CONFIG_PATH`: Directory for persistent JSON files (default: /app/config)
 - `HISTORY_FILENAME`: Filename for sync history (default: sync_history.json)
 - `PATHS_FILENAME`: Filename for saved paths (default: saved_paths.json)
+- `SCHEDULED_JOBS_FILENAME`: Filename for scheduled jobs (default: scheduled_jobs.json)
 - `BROWSE_ROOT`: Root directory for file browsing (default: /mnt/data)
 
 ---
@@ -98,6 +100,7 @@ RsyncWebUI stores your sync history and saved paths in JSON files located in the
 
 - `sync_history.json`: Contains a record of all your sync operations
 - `saved_paths.json`: Stores your saved source and destination paths
+- `scheduled_jobs.json`: Stores your scheduled sync jobs
 
 You can customize the location and filenames of these files using the environment variables described in the configuration section.
 
@@ -147,7 +150,27 @@ Follow it to quickly update GitHub after changes!
 - Dockerized deployment completed
 - Feature-rich, simple UI
 - Configurable persistent storage for settings and history
+- Automated scheduling for one-time and recurring sync jobs
 - Open to contributions!
+
+## 📅 Scheduling Sync Jobs
+RsyncWebUI now supports scheduling sync jobs to run automatically at specified times:
+
+### Types of Schedules
+- **One-time**: Run a sync job once at a specific date and time
+- **Recurring**: Set up jobs to run on a regular schedule:
+  - **Hourly**: Every X hours
+  - **Daily**: Every X days at a specific time
+  - **Weekly**: On selected days of the week at a specific time
+  - **Monthly**: On a specific day of the month at a specific time
+
+### Managing Scheduled Jobs
+1. Click on "Schedule Rsync Jobs" from the main page
+2. Configure your source and destination paths
+3. Set your rsync options
+4. Choose your schedule type and configure the timing
+5. Click "Schedule Sync" to create the job
+6. View, edit, or delete your scheduled jobs from the table
 
 ---
 

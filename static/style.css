@@ -13,6 +13,16 @@ body {
   border-radius: 12px;
   box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
+.nav-link {
+  display: inline-block;
+  margin-bottom: 20px;
+  color: #007BFF;
+  text-decoration: none;
+  font-weight: bold;
+}
+.nav-link:hover {
+  text-decoration: underline;
+}
 label {
   display: block;
   margin-top: 10px;
@@ -199,4 +209,104 @@ pre {
 
 #historyTable td button {
   margin-right: 6px;
+}
+
+/* Schedule page styles */
+.schedule-options {
+  background-color: #f9f9f9;
+  padding: 15px;
+  border-radius: 8px;
+  margin: 15px 0;
+  border: 1px solid #e0e0e0;
+}
+
+.schedule-row {
+  margin-bottom: 15px;
+  padding: 10px;
+  border-radius: 5px;
+  background-color: #fff;
+  border: 1px solid #eee;
+}
+
+.schedule-row label {
+  display: inline-block;
+  margin-right: 15px;
+  margin-top: 0;
+}
+
+.frequency-options {
+  margin-top: 10px;
+  padding: 10px;
+  background-color: #f0f8ff;
+  border-radius: 5px;
+}
+
+.weekday-selector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 10px 0;
+}
+
+.weekday-selector label {
+  margin-top: 0;
+  margin-bottom: 0;
+  display: flex;
+  align-items: center;
+}
+
+.weekday-selector input[type="checkbox"] {
+  width: auto;
+  margin-right: 5px;
+}
+
+#scheduledJobsTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+}
+
+#scheduledJobsTable th, #scheduledJobsTable td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: left;
+}
+
+#scheduledJobsTable th {
+  background-color: #f8f8f8;
+}
+
+#scheduledJobsTable tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+#scheduledJobsTable button {
+  padding: 6px 10px;
+  font-size: 14px;
+  border: none;
+  background-color: #007BFF;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-right: 5px;
+}
+
+#scheduledJobsTable button:hover {
+  background-color: #0056b3;
+}
+
+#deleteSelectedBtn {
+  margin-top: 10px;
+}
+
+input[type="radio"], input[type="checkbox"] {
+  width: auto;
+  margin-right: 5px;
+}
+
+input[type="datetime-local"], input[type="time"], select {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-bottom: 10px;
 }

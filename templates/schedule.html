@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Schedule Rsync - Web UI</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Schedule Rsync Jobs</h1>
+    <a href="/" class="nav-link">← Back to Main Page</a>
+
+    <form id="scheduleForm">
+      <label>Source Path:</label>
+      <div class="path-input">
+        <input type="text" id="sourcePath" name="source" required>
+        <button type="button" onclick="openBrowser('sourcePath')">Browse</button>
+      </div>
+
+      <label>Destination Path:</label>
+      <div class="path-input">
+        <input type="text" id="destPath" name="destination" required>
+        <button type="button" onclick="openBrowser('destPath')">Browse</button>
+      </div>
+
+      <label>Rsync Options:</label>
+      <input type="text" id="rsyncOptions" name="options" value="-avh --progress">
+      
+      <div class="schedule-options">
+        <h3>Schedule Options</h3>
+        
+        <div class="schedule-row">
+          <label>
+            <input type="radio" name="scheduleType" value="once" checked> 
+            Run Once
+          </label>
+          <div id="onceOptions">
+            <label>Date and Time:</label>
+            <input type="datetime-local" id="scheduleDateTime" name="scheduleDateTime" required>
+          </div>
+        </div>
+        
+        <div class="schedule-row">
+          <label>
+            <input type="radio" name="scheduleType" value="recurring"> 
+            Recurring
+          </label>
+          <div id="recurringOptions">
+            <label>Frequency:</label>
+            <select id="frequency" name="frequency">
+              <option value="hourly">Hourly</option>
+              <option value="daily">Daily</option>
+              <option value="weekly">Weekly</option>
+              <option value="monthly">Monthly</option>
+            </select>
+            
+            <div id="hourlyOptions" class="frequency-options">
+              <label>Every <input type="number" id="hourlyInterval" name="hourlyInterval" min="1" value="1" style="width: 60px;"> hour(s)</label>
+            </div>
+            
+            <div id="dailyOptions" class="frequency-options" style="display: none;">
+              <label>Every <input type="number" id="dailyInterval" name="dailyInterval" min="1" value="1" style="width: 60px;"> day(s)</label>
+              <label>At time: <input type="time" id="dailyTime" name="dailyTime" value="00:00"></label>
+            </div>
+            
+            <div id="weeklyOptions" class="frequency-options" style="display: none;">
+              <label>Every <input type="number" id="weeklyInterval" name="weeklyInterval" min="1" value="1" style="width: 60px;"> week(s)</label>
+              <div class="weekday-selector">
+                <label><input type="checkbox" name="weekday" value="0"> Sunday</label>
+                <label><input type="checkbox" name="weekday" value="1"> Monday</label>
+                <label><input type="checkbox" name="weekday" value="2"> Tuesday</label>
+                <label><input type="checkbox" name="weekday" value="3"> Wednesday</label>
+                <label><input type="checkbox" name="weekday" value="4"> Thursday</label>
+                <label><input type="checkbox" name="weekday" value="5"> Friday</label>
+                <label><input type="checkbox" name="weekday" value="6"> Saturday</label>
+              </div>
+              <label>At time: <input type="time" id="weeklyTime" name="weeklyTime" value="00:00"></label>
+            </div>
+            
+            <div id="monthlyOptions" class="frequency-options" style="display: none;">
+              <label>Day of month: <input type="number" id="monthDay" name="monthDay" min="1" max="31" value="1" style="width: 60px;"></label>
+              <label>At time: <input type="time" id="monthlyTime" name="monthlyTime" value="00:00"></label>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <button type="submit">Schedule Sync</button>
+    </form>
+
+    <div id="notificationBar" class="success" style="display:none;"></div>
+
+    <h2>Scheduled Jobs</h2>
+    <table id="scheduledJobsTable">
+      <thead>
+        <tr>
+          <th><input type="checkbox" id="selectAll" onchange="toggleSelectAll(this)"></th>
+          <th>Source</th>
+          <th>Destination</th>
+          <th>Options</th>
+          <th>Schedule</th>
+          <th>Next Run</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <button id="deleteSelectedBtn" onclick="deleteSelectedSchedules()">Delete Selected</button>
+  </div>
+
+  <div id="browserModal" style="display:none; background:white; padding:20px; border:1px solid #ccc; position:fixed; top:10%; left:10%; width:80%; height:80%; overflow:auto; z-index:1000;">
+    <div style="text-align:right;">
+      <button onclick="closeBrowserModal()" style="font-size: 1.2em;">×</button>
+    </div>
+    <div id="browserContent"></div>
+  </div>
+
+  <script>
+    function toggleSelectAll(master) {
+      document.querySelectorAll('.schedule-checkbox').forEach(cb => cb.checked = master.checked);
+    }
+  </script>
+  <script src="/static/js/schedule.js"></script>
+  <script src="/static/js/folderpicker.js"></script>
+</body>
+</html>

@@ -4,7 +4,7 @@ WORKDIR /app
 
 # Install dependencies
 RUN apt-get update && apt-get install -y rsync && \
-    pip install flask && \
+    pip install flask schedule && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Copy source files

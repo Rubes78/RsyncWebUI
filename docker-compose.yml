@@ -4,7 +4,7 @@ services:
   rsyncwebui:
     build:
       #context: https://github.com/Rubes78/RsyncWebUI.git
-      context: /Quarks/Data/DevOps/RsyncWebUI
+      context: .
     container_name: rsyncwebui
     ports:
       - "5050:5050"
@@ -15,9 +15,10 @@ services:
       - CONFIG_PATH=/app/config
       - HISTORY_FILENAME=sync_history.json
       - PATHS_FILENAME=saved_paths.json
+      - SCHEDULED_JOBS_FILENAME=scheduled_jobs.json
       - BROWSE_ROOT=/mnt/data
     volumes:
-      - ${DOCKER_PATH}:/app/config
+      - ${DOCKER_PATH}/RsyncWebUIDocker:/app/config
       - ${DATA_PATH}:/mnt/data/Quarks
       - ${USB_PATH}:/mnt/data/USB
     restart: unless-stopped

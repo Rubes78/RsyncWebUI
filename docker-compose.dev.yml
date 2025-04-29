@@ -3,7 +3,7 @@ version: "3.8"
 services:
   rsyncwebui:
     build:
-      context: /Quarks/GitHub/RsyncWebUI
+      context: .
     container_name: rsyncwebui
     ports:
       - "5050:5050"
@@ -16,6 +16,7 @@ services:
       - CONFIG_PATH=/app/config
       - HISTORY_FILENAME=sync_history.json
       - PATHS_FILENAME=saved_paths.json
+      - SCHEDULED_JOBS_FILENAME=scheduled_jobs.json
       - BROWSE_ROOT=/mnt/data
     volumes:
       - ${DOCKER_PATH}:/app/config
